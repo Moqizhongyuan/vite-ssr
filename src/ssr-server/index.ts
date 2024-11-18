@@ -1,4 +1,3 @@
-import fs from "fs-extra";
 import express, { RequestHandler, Express } from "express";
 import React from "react";
 import { renderToString } from "react-dom/server";
@@ -6,6 +5,7 @@ import { ViteDevServer } from "vite";
 import path from "path";
 import serve from "serve-static";
 import { performance, PerformanceObserver } from "perf_hooks";
+import { createMemoryFsRead, handleErrorMessage } from "./utils";
 
 const perObserver = new PerformanceObserver((items) => {
   items.getEntries().forEach((entry) => {
@@ -15,19 +15,6 @@ const perObserver = new PerformanceObserver((items) => {
 });
 
 perObserver.observe({ entryTypes: ["measure"] });
-
-function createMemoryFsRead() {
-  const fileContentMap = new Map();
-  return async (filePath: string) => {
-    const cacheResult = fileContentMap.get(filePath);
-    if (cacheResult) {
-      return cacheResult;
-    }
-    const fileContent = await fs.readFile(filePath, "utf-8");
-    fileContentMap.set(filePath, fileContent);
-    return fileContent;
-  };
-}
 
 const memoryFsRead = createMemoryFsRead();
 
@@ -125,9 +112,19 @@ async function createServer() {
     app.use(serve(path.join(cwd, "dist/client")));
   }
 
+  app.use(express.json());
+
+  app.use(express.urlencoded({ extended: true }));
+
   app.listen(3000, () => {
     console.log("Node 服务器已启动~");
     console.log("http://localhost:3000");
+  });
+
+  app.post("/sendErrorLog", (req, res) => {
+    console.log(req.body);
+    handleErrorMessage(req.body);
+    res.send("hello");
   });
 }
 

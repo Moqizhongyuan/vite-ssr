@@ -8,7 +8,10 @@ export interface AppProps {
 
 function App(props: AppProps) {
   const { data } = props;
+  // const a = undefined;
+  // a.foo;
   // @ts-ignore
+
   return (
     <div className="App">
       <Helmet>
@@ -16,6 +19,13 @@ function App(props: AppProps) {
         <link rel="canonical" href="http://mysite.com/example" />
       </Helmet>
       <header className="App-header">
+        <button
+          onClick={() => {
+            throw new Error("aaa");
+          }}
+        >
+          error
+        </button>
         <img src={logo} className="App-logo" alt="logo" />
         <p>Hello Vite + React!</p>
         <p>
