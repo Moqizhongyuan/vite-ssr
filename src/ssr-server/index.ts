@@ -5,7 +5,7 @@ import { renderToString } from "react-dom/server";
 import { ViteDevServer } from "vite";
 import path from "path";
 import serve from "serve-static";
-import { Performance, PerformanceObserver } from "perf_hooks";
+import { performance, PerformanceObserver } from "perf_hooks";
 
 const perObserver = new PerformanceObserver((items) => {
   items.getEntries().forEach((entry) => {
