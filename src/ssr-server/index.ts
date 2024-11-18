@@ -5,6 +5,16 @@ import { renderToString } from "react-dom/server";
 import { ViteDevServer } from "vite";
 import path from "path";
 import serve from "serve-static";
+import { Performance, PerformanceObserver } from "perf_hooks";
+
+const perObserver = new PerformanceObserver((items) => {
+  items.getEntries().forEach((entry) => {
+    console.log("[performance]", entry.name, entry.duration.toFixed(2), "ms");
+    performance.clearMarks();
+  });
+});
+
+perObserver.observe({ entryTypes: ["measure"] });
 
 function createMemoryFsRead() {
   const fileContentMap = new Map();
@@ -79,9 +89,12 @@ async function createSsrMiddleware(app: Express): Promise<RequestHandler> {
       }
       const { ServerEntry, fetchData } = await loadSsrEntryModule(vite);
       const data = await fetchData();
+      performance.mark("render-start");
       const appHtml = renderToString(
         React.createElement(ServerEntry, { data })
       );
+      performance.mark("render-end");
+      performance.measure("renderToString", "render-start", "render-end");
       const templatePath = resolveTemplatePath();
       let template = await memoryFsRead(templatePath);
       // 开发模式下需要注入 HMR、环境变量相关的代码，因此需要调用 vite.transformIndexHtml
