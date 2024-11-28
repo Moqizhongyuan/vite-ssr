@@ -1,6 +1,7 @@
 import logo from "./logo.svg";
 import "./App.css";
 import { Helmet } from "react-helmet";
+import { upLoadTryCatchErr } from "./utils";
 
 export interface AppProps {
   data: any;
@@ -21,7 +22,13 @@ function App(props: AppProps) {
       <header className="App-header">
         <button
           onClick={() => {
-            throw new Error("aaa");
+            try {
+              throw new Error("aaa");
+            } catch (error) {
+              // 如果你希望在此处捕获错误并处理，可以通过
+              // 可以将错误传递给 ErrorBoundary 或做其他处理
+              upLoadTryCatchErr(error as Error);
+            }
           }}
         >
           error

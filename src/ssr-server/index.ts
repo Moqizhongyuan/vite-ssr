@@ -122,7 +122,6 @@ async function createServer() {
   });
 
   app.post("/sendErrorLog", (req, res) => {
-    console.log(req.body);
     handleErrorMessage(req.body);
     res.send("hello");
   });
